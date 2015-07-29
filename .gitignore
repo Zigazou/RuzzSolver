@@ -1,0 +1,7 @@
+.cabal-sandbox/
+*.tar.lzma
+*.hp
+*.prof
+cabal.sandbox.config
+dist/
+

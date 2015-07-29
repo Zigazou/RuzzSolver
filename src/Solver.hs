@@ -19,18 +19,8 @@ module Solver
     , LetterScores
     , Problem
     , Path
-    , letterScores
-    , cellScore
-    , translate
-    , showLetter
-    , readLetter
-    , readMultiplier
-    , readCell
-    , readRow
-    , readGrid
-    , evalScore
     , pathToString
-    , around
+    , readGrid
     , walk
     ) where
 

@@ -22,19 +22,14 @@ module Dictionary
 import Data.List (isPrefixOf, find, nub, take)
 import Control.Applicative ((<$>))
 import Data.Maybe (isJust)
+import qualified Data.Map.Strict as Map
 
 type Word       = String
 type Dictionary = [Word]
 
+type DictionaryMap = Map.Map Int [Word]
+
 data Found      = None | Partial | Complete deriving (Show, Eq, Ord)
-
-mayStart :: String -> Dictionary -> Bool
-mayStart s dict = isJust $ find (== True) (isPrefixOf s <$> dict)
-
-{-
-getPrefixes :: Int -> Dictionary -> [String]
-getPrefixes len = nub (take len
--}
 
 checkWord :: String -> Word -> Found
 checkWord [] [] = Complete
