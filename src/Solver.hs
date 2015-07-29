@@ -12,7 +12,7 @@ Solver
 module Solver
     ( Letter(..)
     , Multiplier(..)
-    , Cell(letter, multiplier, used)
+    , Cell(letter, multiplier)
     , Score
     , Position
     , Grid
@@ -22,34 +22,89 @@ module Solver
     , pathToString
     , readGrid
     , walk
+    , around
+    , translate
     ) where
 
 import Data.Array
 import Data.List ((\\))
-import Control.Applicative ((<$>))
 import Dictionary
 
+{-|
+The solver use only the alphabetic letters, independently of their case and
+without any accent.
+-}
 data Letter = La | Lb | Lc | Ld | Le | Lf | Lg | Lh | Li | Lj | Lk | Ll | Lm
             | Ln | Lo | Lp | Lq | Lr | Ls | Lt | Lu | Lv | Lw | Lx | Ly | Lz
             deriving (Eq, Show, Enum, Ord, Bounded, Ix)
 
+{-|
+A 'Cell' may have a multiplier bonus which is applied to the whole word or to
+the letter.
+-}
 data Multiplier = MultiplyLetter Int
                 | MultiplyWord Int
                 deriving (Show, Eq)
 
+{-|
+A 'Grid' is composed of 'Cell's. A 'Cell' holds a 'Letter' and a 'Multiplier'.
+-}
 data Cell = Cell { letter     :: Letter
                  , multiplier :: Multiplier
-                 , used       :: Bool
                  } deriving (Show)
 
+{-|
+A 'Score' is calculated using an 'Int'
+-}
 type Score        = Int
+
+{-|
+A 'Grid' is a 2-dimensional array. A tuple of two 'Int' is used to address each
+'Cell'.
+-}
 type Position     = (Int, Int)
+
+{-|
+A 'Grid' is a 2-dimensional array containing 'Cell's indexed by their
+'Position'.
+-}
 type Grid         = Array Position Cell
+
+{-|
+A 'Letter' has a value determined by its frequency in the french language. The
+values are common to the Scrabble game in french.
+-}
 type LetterScores = Array Letter Score
 
+{-|
+As a 'Grid' is not easily interfaced with human, a 'Problem' is used.
+A 'Problem' is simply a 'List' of 'String'. 
+
+Here is an example:
+
+    [ "UdA U Tt"
+    , "S UDNTCt"
+    , "T A R S "
+    , "E I TDC "
+    ]
+
+'Cell's are represented by two consecutive characters. The first is the
+uppercase letter. The second indicates the multiplier bonus for this particular
+'Cell': d for double letter, t for triple letter, D for double word and T for
+triple word. Everything is considered a multiplier of 1.
+-}
 type Problem      = [String]
+
+{-|
+A 'Path' is a 'List' of 'Position's used to keep track of a walk through the
+'Grid'. It can then be converted to a 'Word' or used to compute the score.
+-}
 type Path         = [Position]
 
+{-|
+This function returns an 'Array' containing the 'Score's for each letter. The
+'Array' is indexed by the 'Letter'.
+-}
 letterScores :: LetterScores
 letterScores = array
                 (La, Lz)
@@ -68,18 +123,30 @@ cellScore cell = (letterScores ! letter cell) * mult
     where mult = case multiplier cell of MultiplyLetter m -> m
                                          MultiplyWord   _ -> 1
 
+{-|
+'Translate' is close to the 'tr' Unix command line tool.
+-}
 translate :: (Eq a, Eq b) => [a] -> [b] -> b -> a -> b
 translate (from:froms) (to:tos) def value
     | from == value = to
     | otherwise     = translate froms tos def value
 translate _ _ def _ = def
 
+{-|
+Converts a 'Letter' to a 'Char'
+-}
 showLetter :: Letter -> Char
 showLetter = translate [La .. Lz] ['A' .. 'Z'] (error "Unknown error")
 
+{-|
+Converts a 'Char' to a 'Letter'
+-}
 readLetter :: Char -> Letter
 readLetter = translate ['A' .. 'Z'] [La .. Lz] (error "Invalid char")
 
+{-|
+Read the 'Multiplier' letter in a 'Problem'.
+-}
 readMultiplier :: Char -> Multiplier
 readMultiplier = translate
      ['d', 't', 'D', 'T']
@@ -90,7 +157,6 @@ readCell :: String -> (Cell, String)
 readCell (oneLetter:oneMultiplier:remains) =
     ( Cell { letter     = readLetter oneLetter
            , multiplier = readMultiplier oneMultiplier
-           , used       = False
            }
     , remains
     )
@@ -108,7 +174,8 @@ pathToString :: Grid -> Path -> String
 pathToString grid = map (showLetter . letter . (grid !))
 
 pathToCells :: Grid -> Path -> [Cell]
-pathToCells grid = map (grid !)
+--pathToCells grid = map (grid !)
+pathToCells = map . (!)
 
 evalScore' :: Score -> Int -> [Cell] -> Score
 evalScore' score mult [] = score * mult
@@ -135,10 +202,11 @@ walk grid dictionary = concat $ map walker initialPaths
     where initialPaths :: [Path]
           initialPaths = concat $ map (\p1 -> map (\p2 -> p1:p2:[]) (around p1)) [(x, y) | x <- [0 .. 3], y <- [0 .. 3]]
           walker :: Path -> [Path]
-          walker path = case check (pathToString grid path) dictionary of
+          walker path = case lookUp dictionary (pathToString grid path) of
                             None     -> []
                             Partial  -> concat nextPaths
                             Complete -> path: concat nextPaths
+                            Final    -> path: []
               where position  = last path
                     arounds   = around position \\ path
                     nextPaths = map (walker . (path ++) . (: [])) arounds

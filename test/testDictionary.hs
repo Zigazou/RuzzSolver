@@ -12,44 +12,42 @@ Tests for Dictionary
 -}
 module Main where
 
-import           Control.Monad       (unless)
-import           System.Exit         (exitFailure)
-import           Test.QuickCheck
-import           Test.QuickCheck.Monadic (assert, monadicIO, run)
-import           Control.Applicative ((<$>))
-import           Data.List (nub, (\\), find)
-import           Data.Maybe (isNothing)
+import Control.Monad       (unless)
+import System.Exit         (exitFailure)
+import Control.Applicative ((<$>))
+import Test.QuickCheck
+import Test.QuickCheck.Monadic (assert, monadicIO, run)
 
-import           Dictionary
+import Dictionary
 
--- Tests for checkWord function
-newtype TestWord = TestWord String deriving Show
-instance Arbitrary TestWord where
-    arbitrary = TestWord <$> (listOf $ elements ['A' .. 'Z'])
+getResults :: [String] -> Dictionary -> [Found]
+getResults inputs dict = lookUp dict <$> inputs
 
-prop_checkWordComplete :: TestWord -> Bool
-prop_checkWordComplete (TestWord word) =
-    checkWord word word == Complete
+testFound :: Found -> [String] -> Property
+testFound result inputs =
+    once $ monadicIO $ do
+        results <- run $ getDictionary >>= return . getResults inputs
+        assert $ results == replicate (length results) result
 
-prop_checkWordPartial :: TestWord -> Bool
-prop_checkWordPartial (TestWord word) =
-    checkWord word (word ++ "A") == Partial
+prop_wordNone :: Property
+prop_wordNone =
+    testFound None
+              [ "XXX", "APOFILFJ", "ZERPIOVV", "MLKOPQIGDZ", "QMLD" ]
 
-prop_checkWordNone :: TestWord -> Bool
-prop_checkWordNone (TestWord []  ) = True
-prop_checkWordNone (TestWord word) = checkWord (word) ('x':word) == None
+prop_wordPartial :: Property
+prop_wordPartial =
+    testFound Partial
+              [ "ASSENTI", "LESIONN", "DEZINGU", "RETEINDR", "TITILLASS" ]
 
--- Tests for getDictionary
+prop_wordComplete :: Property
+prop_wordComplete =
+    testFound Complete
+              [ "BISE", "MONTE", "FLASH", "HERBAGE", "ORAL" ]
 
-prop_DictionaryLength :: Property
-prop_DictionaryLength =
-    once $ monadicIO $ run getDictionary >>= assert . (== 386264) . length
-
-prop_validDictionary :: Property
-prop_validDictionary =
-    once $ monadicIO $ run getDictionary >>= assert . validDictionary
-    where validDictionary = isNothing . find invalidWord
-          invalidWord word = [] /= nub word \\ ['A' .. 'Z']
+prop_wordFinal :: Property
+prop_wordFinal =
+    testFound Final
+              [ "PANEZ", "PRONEES", "ANGORS", "BRADES", "EXTRUSIFS" ]
 
 -- Helps TemplateHaskell work...
 return []
@@ -58,3 +56,4 @@ main :: IO ()
 main = do
     allPass <- $quickCheckAll
     unless allPass exitFailure
+
