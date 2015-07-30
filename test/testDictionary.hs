@@ -1,5 +1,5 @@
 {-# LANGUAGE TemplateHaskell #-}
-{-|
+{- |
 Module      : testDictionary
 Description : Tests for Dictionary
 Copyright   : (c) Frédéric BISSON, 2015
@@ -12,8 +12,8 @@ Tests for Dictionary
 -}
 module Main where
 
-import Control.Monad       (unless)
-import System.Exit         (exitFailure)
+import Control.Monad (unless, liftM)
+import System.Exit (exitFailure)
 import Control.Applicative ((<$>))
 import Test.QuickCheck
 import Test.QuickCheck.Monadic (assert, monadicIO, run)
@@ -26,7 +26,8 @@ getResults inputs dict = lookUp dict <$> inputs
 testFound :: Found -> [String] -> Property
 testFound result inputs =
     once $ monadicIO $ do
-        results <- run $ getDictionary >>= return . getResults inputs
+        results <- run $ liftM (getResults inputs)
+                               (getDictionary "dictionary/ruzzdictionary.txt")
         assert $ results == replicate (length results) result
 
 prop_wordNone :: Property
@@ -56,4 +57,3 @@ main :: IO ()
 main = do
     allPass <- $quickCheckAll
     unless allPass exitFailure
-

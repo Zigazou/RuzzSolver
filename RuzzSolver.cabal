@@ -24,7 +24,14 @@ executable RuzzSolver
                ,       containers
 
   hs-source-dirs:      src
-  ghc-options:         -Wall -rtsopts
+  ghc-options:         -Wall
+                       -fllvm
+                       -rtsopts
+                       -fwarn-incomplete-patterns
+                       -fwarn-incomplete-uni-patterns
+                       -fno-warn-unused-do-bind
+                       -O2
+                       "-with-rtsopts=-A67108864 -H1073741824"
   default-language:    Haskell2010
 
 executable RuzzSolver-profiling
@@ -38,7 +45,9 @@ executable RuzzSolver-profiling
                        -rtsopts
                        -threaded
                        -fprof-auto
-                       -prof
+                       -fwarn-incomplete-patterns
+                       -fwarn-incomplete-uni-patterns
+                       -fno-warn-unused-do-bind
                        "-with-rtsopts=-N -p -s -h -i0.1"
   default-language:    Haskell2010
 
