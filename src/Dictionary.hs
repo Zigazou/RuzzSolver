@@ -7,7 +7,10 @@ Maintainer  : zigazou@free.fr
 Stability   : experimental
 Portability : POSIX
 
-French dictionary functions for use with Ruzzle Solver
+French dictionary functions for use with Ruzzle Solver. The 'Dictionary' uses
+a 'Tree' structure to optimize lookups and is able to tell if a 'Word' is
+complete (but is also the start of other words), partial or final (word is
+valid but is not the start of other words).
 -}
 module Dictionary
     ( Word
@@ -40,13 +43,15 @@ type Word = String
 
 {-|
 The 'Found' type tells how a lookup in a dictionary went :
-
-  * None: the lookup found no word
-  * Partial: the lookup found the start of a word, which itself is not a word
-  * Complete: the lookup found a word which is also the start of another word
-  * Final: the lookup found a word which is not the start of another word
 -}
-data Found = None | Partial | Complete | Final deriving (Show, Eq, Ord)
+data Found = None     -- ^ the lookup found no word
+           | Partial  -- ^ the lookup found the start of a word, which itself
+                      --   is not a word
+           | Complete -- ^ the lookup found a word which is also the start of
+                      --   another word
+           | Final    -- ^ the lookup found a word which is not the start of
+                      --   another word
+           deriving (Show, Eq, Ord)
 
 {-|
 A 'Dictionary' is in fact a 'Forest' of 'TChar'
@@ -83,14 +88,14 @@ These three elements contains exactly the same elements than the source.
 -}
 splitAtD :: DictForest -> TChar -> (DictForest, Maybe DictTree, DictForest)
 splitAtD [] _ = ([], Nothing, [])
-splitAtD (tree:remains) tc = splitAtD' ([], Just tree, remains)
+splitAtD (tree:remains) tc = splitAtD' ([], tree, remains)
     where
-        splitAtD' :: (DictForest, Maybe DictTree, DictForest)
+        splitAtD' :: (DictForest, DictTree, DictForest)
                   -> (DictForest, Maybe DictTree, DictForest)
-        splitAtD' (start, Just item, next:end)
+        splitAtD' (start, item, next:end)
             | rootLabel item ~= tc = (start, Just item, next:end)
-            | otherwise            = splitAtD' (item:start, Just next, end)
-        splitAtD' (start, Just item, [])
+            | otherwise            = splitAtD' (item:start, next, end)
+        splitAtD' (start, item, [])
             | rootLabel item ~= tc = (start, Just item, [])
             | otherwise            = (item:start, Nothing, [])
 
@@ -115,12 +120,7 @@ Merge a 'Tree' into a 'Forest'
     (_, Nothing, _) -> tree:dict
 
 {-|
-Search a 'Word' in a 'Dictionary'. It returns a 'Found' value:
-
-  * None: the word is not in the dictionary
-  * Partial: the lookup found the start of a word, which itself is not a word
-  * Complete: the lookup found a word which is also the start of another word
-  * Final: the lookup found a word which is not the start of another word
+Search a 'Word' in a 'Dictionary'. It returns a 'Found' value.
 -}
 lookUp :: Dictionary -> Word -> Found
 lookUp [] _  = None
