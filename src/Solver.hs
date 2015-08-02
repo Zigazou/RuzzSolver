@@ -19,7 +19,7 @@ module Solver
     , translate, around
 
       -- * 'Score' functions
-    , letterScores, lengthScores, cellScore, evalScore', evalScore
+    , letterScores, lengthScores, evalScore
 
       -- * 'Problem' functions
     , readCell, readRow, readGrid
@@ -164,34 +164,21 @@ lengthScores 5  = 5
 lengthScores _  = 0
 
 {- |
-Calculate the 'Score' of a single 'Cell'
+Calculates an intermediate score in the form of a tuple ('Score', 'Int') where
+the first is the current score and the second the current word multiplier.
 -}
-cellScore :: Cell -> Score
-cellScore cell = (letterScores ! letter cell) * mult
-    where mult = case multiplier cell of
-                    MultiplyLetter m -> m
-                    MultiplyWord   _ -> 1
-
-{- |
-Calculates the 'Score' from a list of 'Cell's.
--}
-evalScore' :: Score  -- ^ Initial 'Score'
-           -> Int    -- ^ Current word multiplier
-           -> [Cell] -- ^ List of 'Cell's
-           -> Score  -- ^ Calculated 'Score'
-evalScore' score mult [] = score * mult
-evalScore' score mult (cell : remains) =
-    evalScore' (score + cellScore cell) mult' remains
-    where mult' = case multiplier cell of
-                    MultiplyLetter _ -> mult
-                    MultiplyWord   m -> mult * m
+plus :: (Score, Int) -> Cell -> (Score, Int)
+plus (s, m) cell = (s + (letterScores ! letter cell) * mletter, m * mword)
+    where (mletter, mword) = case multiplier cell of
+                                MultiplyLetter m' -> (m', 1)
+                                MultiplyWord   m' -> (1, m')
 
 {- |
 Calculates the 'Score' from a 'Path' in a 'Grid'.
 -}
 evalScore :: Grid -> Path -> Score
-evalScore grid path = (evalScore' 0 1 . pathToCells grid) path
-                    + (lengthScores . length) path
+evalScore grid path = score * mult + (lengthScores . length) path
+    where (score, mult) = (foldl plus (0, 1) . pathToCells grid) path
 
 {- |
 Converts a 'Letter' to a 'Char'

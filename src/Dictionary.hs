@@ -129,11 +129,17 @@ lookUp dict (first : remains) = found
     where
         treeM = findChar dict (TChar first False)
         found = case (remains, treeM) of
+            -- The last letter of the word has been found
             ([], Just t)  -> case (subForest t, rootLabel t) of
+                -- The word is complete and there is no longer word
                 ([], _            ) -> Final
+                -- The word is complete but longer words exists
                 (_ , TChar _ True ) -> Complete
+                -- The word is not complete
                 (_ , TChar _ False) -> Partial
+            -- The letter has been found, go on with the remaining letters
             (_ , Just t)  -> lookUp (subForest t) remains
+            -- The letter has not been found, the word is not in the dictionary
             (_ , Nothing) -> None
 
 {- |
