@@ -17,7 +17,9 @@ import System.Exit (exitFailure)
 import Test.QuickCheck
 import Test.QuickCheck.Monadic (assert, monadicIO, run)
 
-import Solver (translate, around, readGrid, walk)
+import Solver.Walker (walk)
+import Solver.Helper (translate, around)
+import Solver.Problem (readGrid)
 import Dictionary
 
 -- Tests for translate function

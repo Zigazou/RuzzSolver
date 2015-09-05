@@ -1,7 +1,12 @@
-import Control.Applicative ((<$>))
 import Control.Monad (liftM)
+
 import Dictionary (DictWord, getDictionary)
-import Solver (Score, readGrid, walk, pathToString, evalScore)
+import Solver.Types (Score)
+import Solver.Walker (walk)
+import Solver.Problem (readGrid)
+import Solver.Path (pathToString)
+import Solver.Score (evalScore)
+
 import Data.List (sortBy, nubBy)
 import Data.Ord (comparing)
 import Control.Arrow ((&&&))
