@@ -7,7 +7,7 @@ Maintainer  : zigazou@free.fr
 Stability   : experimental
 Portability : POSIX
 
-The Solver can take a 'Grid' and a 'Dictionary' and searches for all 'Word's
+The Solver can take a 'Grid' and a 'Dictionary' and searches for all 'DictWord's
 that can be constructed in the 'Grid' that appears in the 'Dictionary'.
 -}
 module Solver
@@ -33,7 +33,6 @@ module Solver
 
 import Data.Array
 import Data.List ((\\))
-import Control.Applicative ((<$>))
 import Dictionary
 
 {- |
@@ -103,7 +102,7 @@ type Problem      = [String]
 
 {- |
 A 'Path' is a 'List' of 'Position's used to keep track of a walk through the
-'Grid'. It can then be converted to a 'Word' or used to compute the score.
+'Grid'. It can then be converted to a 'DictWord' or used to compute the score.
 -}
 type Path         = [Position]
 
@@ -247,9 +246,9 @@ initPaths = [[(x, y), p] | x <- [0 .. 3], y <- [0 .. 3], p <- around (x, y)]
 {- |
 Given a 'Grid' and a 'Dictionary', finds all the words from the 'Dictionary'
 that can be drawn in the 'Grid'. It returns them in the form of 'List' of
-'Path's, allowing afterwards an easy conversion to a 'Word' or a 'Score'.
+'Path's, allowing afterwards an easy conversion to a 'DictWord' or a 'Score'.
 
-'Word's can be constructed from the letters of sequentially adjacent 'Cell's,
+'DictWord's can be constructed from the letters of sequentially adjacent 'Cell's,
 where "adjacent" 'Cell's are those horizontally, vertically, and diagonally
 neighboring. 'Word's must be at least two letters long, may include singular
 and plural (or other derived forms) separately, but may not use the same 'Cell'

@@ -14,7 +14,6 @@ module Main where
 
 import Control.Monad (unless, liftM)
 import System.Exit (exitFailure)
-import Control.Applicative ((<$>))
 import Test.QuickCheck
 import Test.QuickCheck.Monadic (assert, monadicIO, run)
 

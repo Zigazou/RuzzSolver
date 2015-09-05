@@ -8,12 +8,12 @@ Stability   : experimental
 Portability : POSIX
 
 French dictionary functions for use with Ruzzle Solver. The 'Dictionary' uses
-a 'Tree' structure to optimize lookups and is able to tell if a 'Word' is
+a 'Tree' structure to optimize lookups and is able to tell if a 'DictWord' is
 complete (but is also the start of other words), partial or final (word is
 valid but is not the start of other words).
 -}
 module Dictionary
-    ( Word
+    ( DictWord
     , Dictionary
     , Found (None, Partial, Complete, Final)
     , getDictionary
@@ -21,7 +21,6 @@ module Dictionary
     ) where
 
 import Data.Tree (Forest, Tree (Node), rootLabel, subForest)
-import Control.Applicative ((<$>))
 
 {- |
 A TChar contains one character and a boolean indicating if a word can be
@@ -37,9 +36,9 @@ type DictForest = Forest TChar
 type DictTree = Tree TChar
 
 {- |
-A 'Word' is simply a 'String' which can be searched in a dictionary
+A 'DictWord' is simply a 'String' which can be searched in a dictionary
 -}
-type Word = String
+type DictWord = String
 
 {- |
 The 'Found' type tells how a lookup in a dictionary went :
@@ -120,9 +119,9 @@ Merge a 'Tree' into a 'Forest'
     (_, Nothing, _) -> tree : dict
 
 {- |
-Search a 'Word' in a 'Dictionary'. It returns a 'Found' value.
+Search a 'DictWord' in a 'Dictionary'. It returns a 'Found' value.
 -}
-lookUp :: Dictionary -> Word -> Found
+lookUp :: Dictionary -> DictWord -> Found
 lookUp [] _  = None
 lookUp _  [] = None
 lookUp dict (first : remains) = found

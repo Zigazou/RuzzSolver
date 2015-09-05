@@ -1,6 +1,6 @@
 import Control.Applicative ((<$>))
 import Control.Monad (liftM)
-import Dictionary (Word, getDictionary)
+import Dictionary (DictWord, getDictionary)
 import Solver (Score, readGrid, walk, pathToString, evalScore)
 import Data.List (sortBy, nubBy)
 import Data.Ord (comparing)
@@ -8,7 +8,7 @@ import Control.Arrow ((&&&))
 import Data.Function (on)
 import System.Environment (getArgs)
 
-prettyPrint :: (Word, Score) -> String
+prettyPrint :: (DictWord, Score) -> String
 prettyPrint (word, score) = word ++ ": " ++ show score
 
 main :: IO ()

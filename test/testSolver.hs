@@ -16,7 +16,6 @@ import Control.Monad (unless, liftM)
 import System.Exit (exitFailure)
 import Test.QuickCheck
 import Test.QuickCheck.Monadic (assert, monadicIO, run)
-import Control.Applicative ((<$>))
 
 import Solver (translate, around, readGrid, walk)
 import Dictionary
