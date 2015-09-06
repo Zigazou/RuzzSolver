@@ -27,6 +27,7 @@ These 2 characters are:
     - any other letter = no multiplier
 
 For example, the problem:
+
     UdA_U_Tt
     S_UDNTCt
     T_A_R_S_
