@@ -14,7 +14,8 @@ data-dir: ""
 library
     build-depends: HUnit >=1.2 && <2, QuickCheck >=2.4, array -any,
                    base >=4.7, containers -any, test-framework >=0.4.1,
-                   test-framework-hunit -any, test-framework-quickcheck2 -any
+                   test-framework-hunit -any, test-framework-quickcheck2 -any,
+                   template-haskell -any, th-lift -any
     exposed-modules: Dictionary
                      Solver.Helper
                      Solver.Path
@@ -31,7 +32,8 @@ library
 executable RuzzSolver-profiling
     build-depends: HUnit >=1.2 && <2, QuickCheck >=2.4, array -any,
                    base >=4.7, containers -any, test-framework >=0.4.1,
-                   test-framework-hunit -any, test-framework-quickcheck2 -any
+                   test-framework-hunit -any, test-framework-quickcheck2 -any,
+                   template-haskell -any, th-lift -any
     main-is: ruzzSolver.hs
     buildable: True
     default-language: Haskell2010
@@ -41,7 +43,8 @@ executable RuzzSolver-profiling
 executable RuzzSolver
     build-depends: HUnit >=1.2 && <2, QuickCheck >=2.4, array -any,
                    base >=4.7, containers -any, test-framework >=0.4.1,
-                   test-framework-hunit -any, test-framework-quickcheck2 -any
+                   test-framework-hunit -any, test-framework-quickcheck2 -any,
+                   template-haskell -any, th-lift -any
     main-is: ruzzSolver.hs
     buildable: True
     default-language: Haskell2010
@@ -51,7 +54,8 @@ executable RuzzSolver
 test-suite test-Solver
     build-depends: HUnit >=1.2 && <2, QuickCheck >=2.4, array -any,
                    base >=4.7, containers -any, test-framework >=0.4.1,
-                   test-framework-hunit -any, test-framework-quickcheck2 -any
+                   test-framework-hunit -any, test-framework-quickcheck2 -any,
+                   template-haskell -any, th-lift -any
     type: exitcode-stdio-1.0
     main-is: testSolver.hs
     buildable: True
@@ -62,7 +66,8 @@ test-suite test-Solver
 test-suite test-Dictionary
     build-depends: HUnit >=1.2 && <2, QuickCheck >=2.4, array -any,
                    base >=4.7, containers -any, test-framework >=0.4.1,
-                   test-framework-hunit -any, test-framework-quickcheck2 -any
+                   test-framework-hunit -any, test-framework-quickcheck2 -any,
+                   template-haskell -any, th-lift -any
     type: exitcode-stdio-1.0
     main-is: testDictionary.hs
     buildable: True

@@ -1,3 +1,4 @@
+{-# LANGUAGE TemplateHaskell #-}
 {- |
 Module      : Dictionary
 Description : French dictionary functions for use with Ruzzle Solver
@@ -17,10 +18,13 @@ module Dictionary
     , Dictionary
     , Found (None, Partial, Complete, Final)
     , getDictionary
+    , getDictionaryQ
     , lookUp
     ) where
 
 import Data.Tree (Forest, Tree (Node), rootLabel, subForest)
+import Language.Haskell.TH.Syntax
+import Language.Haskell.TH.Lift
 
 {- |
 A TChar contains one character and a boolean indicating if a word can be
@@ -56,6 +60,9 @@ data Found = None     -- ^ the lookup found no word
 A 'Dictionary' is in fact a 'Forest' of 'TChar'
 -}
 type Dictionary = DictForest
+
+$(deriveLift ''TChar)
+$(deriveLift ''Tree)
 
 {- |
 '~=' is an equal operator which doesn’t take the boolean of a TChar
@@ -148,5 +155,13 @@ dictionary optimised for future searches.
 getDictionary :: String -> IO Dictionary
 getDictionary dictionaryFilePath = do
     content <- readFile dictionaryFilePath
-
     return $ foldl (+++) [] (createTree <$> lines content)
+
+{- |
+Embeds a specific dictionary (ASCII format, one word per line) and in the
+executable file.
+-}
+getDictionaryQ :: String -> Q Exp
+getDictionaryQ dictionaryFilePath = do
+    content <- runIO $ readFile dictionaryFilePath
+    lift $ foldl (+++) [] (createTree <$> lines content)

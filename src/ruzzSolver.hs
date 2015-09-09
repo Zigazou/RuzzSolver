@@ -1,3 +1,4 @@
+{-# LANGUAGE TemplateHaskell #-}
 {- |
 Module      : ruzzSolver
 Description : Reads Ruzzle problems and solves them
@@ -10,7 +11,7 @@ Portability : POSIX
 -}
 import Control.Monad (liftM)
 
-import Dictionary (Dictionary, DictWord, getDictionary)
+import Dictionary (Dictionary, DictWord, getDictionaryQ)
 import Solver.Types (Score, Grid, Path)
 import Solver.Walker (walk)
 import Solver.Problem (readGrid)
@@ -64,7 +65,8 @@ main = do
     problemFilePaths <- getArgs
 
     -- Get the dictionary
-    dictionary <- getDictionary "dictionary/ruzzdictionary.txt"
+    --dictionary <- getDictionary "dictionary/ruzzdictionary.txt"
+    let dictionary = $(getDictionaryQ "dictionary/ruzzdictionary.txt")
 
     -- Get a list of 'Grid's to solve
     grids <- mapM loadGrid problemFilePaths
