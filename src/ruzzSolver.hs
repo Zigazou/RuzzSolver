@@ -17,7 +17,7 @@ import Solver.Problem (readGrid)
 import Solver.Path (pathToString)
 import Solver.Score (evalScore)
 
-import Data.List (sortBy, nubBy, intersperse)
+import Data.List (sortBy, nubBy, intercalate)
 import Data.Ord (comparing)
 import Control.Arrow ((&&&))
 import Data.Function (on)
@@ -30,7 +30,7 @@ Prepares 'Result' for printing.
 -}
 showResult :: Result -> String
 showResult (solutions, scores) =
-    concat $ intersperse "\n" $
+    intercalate "\n" $
         (prettyPrint <$> scores)
         ++ [ (show . length) scores ++ " words found." ]
         ++ [ (show . length) solutions ++ " solutions found." ]
@@ -73,4 +73,4 @@ main = do
     let results = solveGrid dictionary <$> grids
 
     -- Display 'Result's
-    mapM_ putStrLn (intersperse (take 79 $ repeat '-') $ showResult <$> results)
+    putStrLn $ intercalate (replicate 79 '-') $ showResult <$> results
